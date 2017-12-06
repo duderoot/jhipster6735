@@ -21,6 +21,6 @@
     "entityTableName": "sponsor_agreement",
     "dto": "no",
     "pagination": "no",
-    "service": "no",
+    "service": "serviceClass",
     "jpaMetamodelFiltering": true
 }
