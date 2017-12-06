@@ -1,0 +1,11 @@
+entity Sponsor {
+    name String
+}
+
+entity SponsorAgreement {
+    total Float
+}
+
+relationship OneToOne {
+    SponsorAgreement{sponsor required} to Sponsor{sponsorAgreement}
+}
