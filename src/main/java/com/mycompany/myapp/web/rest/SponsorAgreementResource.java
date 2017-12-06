@@ -2,10 +2,11 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.SponsorAgreement;
-
-import com.mycompany.myapp.repository.SponsorAgreementRepository;
+import com.mycompany.myapp.service.SponsorAgreementService;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
+import com.mycompany.myapp.service.dto.SponsorAgreementCriteria;
+import com.mycompany.myapp.service.SponsorAgreementQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,13 @@ public class SponsorAgreementResource {
 
     private static final String ENTITY_NAME = "sponsorAgreement";
 
-    private final SponsorAgreementRepository sponsorAgreementRepository;
+    private final SponsorAgreementService sponsorAgreementService;
 
-    public SponsorAgreementResource(SponsorAgreementRepository sponsorAgreementRepository) {
-        this.sponsorAgreementRepository = sponsorAgreementRepository;
+    private final SponsorAgreementQueryService sponsorAgreementQueryService;
+
+    public SponsorAgreementResource(SponsorAgreementService sponsorAgreementService, SponsorAgreementQueryService sponsorAgreementQueryService) {
+        this.sponsorAgreementService = sponsorAgreementService;
+        this.sponsorAgreementQueryService = sponsorAgreementQueryService;
     }
 
     /**
@@ -50,7 +54,7 @@ public class SponsorAgreementResource {
         if (sponsorAgreement.getId() != null) {
             throw new BadRequestAlertException("A new sponsorAgreement cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        SponsorAgreement result = sponsorAgreementRepository.save(sponsorAgreement);
+        SponsorAgreement result = sponsorAgreementService.save(sponsorAgreement);
         return ResponseEntity.created(new URI("/api/sponsor-agreements/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -72,7 +76,7 @@ public class SponsorAgreementResource {
         if (sponsorAgreement.getId() == null) {
             return createSponsorAgreement(sponsorAgreement);
         }
-        SponsorAgreement result = sponsorAgreementRepository.save(sponsorAgreement);
+        SponsorAgreement result = sponsorAgreementService.save(sponsorAgreement);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, sponsorAgreement.getId().toString()))
             .body(result);
@@ -81,14 +85,16 @@ public class SponsorAgreementResource {
     /**
      * GET  /sponsor-agreements : get all the sponsorAgreements.
      *
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of sponsorAgreements in body
      */
     @GetMapping("/sponsor-agreements")
     @Timed
-    public List<SponsorAgreement> getAllSponsorAgreements() {
-        log.debug("REST request to get all SponsorAgreements");
-        return sponsorAgreementRepository.findAll();
-        }
+    public ResponseEntity<List<SponsorAgreement>> getAllSponsorAgreements(SponsorAgreementCriteria criteria) {
+        log.debug("REST request to get SponsorAgreements by criteria: {}", criteria);
+        List<SponsorAgreement> entityList = sponsorAgreementQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
 
     /**
      * GET  /sponsor-agreements/:id : get the "id" sponsorAgreement.
@@ -100,7 +106,7 @@ public class SponsorAgreementResource {
     @Timed
     public ResponseEntity<SponsorAgreement> getSponsorAgreement(@PathVariable Long id) {
         log.debug("REST request to get SponsorAgreement : {}", id);
-        SponsorAgreement sponsorAgreement = sponsorAgreementRepository.findOne(id);
+        SponsorAgreement sponsorAgreement = sponsorAgreementService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sponsorAgreement));
     }
 
@@ -114,7 +120,7 @@ public class SponsorAgreementResource {
     @Timed
     public ResponseEntity<Void> deleteSponsorAgreement(@PathVariable Long id) {
         log.debug("REST request to delete SponsorAgreement : {}", id);
-        sponsorAgreementRepository.delete(id);
+        sponsorAgreementService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

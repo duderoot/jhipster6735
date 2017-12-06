@@ -2,10 +2,11 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Sponsor;
-
-import com.mycompany.myapp.repository.SponsorRepository;
+import com.mycompany.myapp.service.SponsorService;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
+import com.mycompany.myapp.service.dto.SponsorCriteria;
+import com.mycompany.myapp.service.SponsorQueryService;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -31,10 +31,13 @@ public class SponsorResource {
 
     private static final String ENTITY_NAME = "sponsor";
 
-    private final SponsorRepository sponsorRepository;
+    private final SponsorService sponsorService;
 
-    public SponsorResource(SponsorRepository sponsorRepository) {
-        this.sponsorRepository = sponsorRepository;
+    private final SponsorQueryService sponsorQueryService;
+
+    public SponsorResource(SponsorService sponsorService, SponsorQueryService sponsorQueryService) {
+        this.sponsorService = sponsorService;
+        this.sponsorQueryService = sponsorQueryService;
     }
 
     /**
@@ -51,7 +54,7 @@ public class SponsorResource {
         if (sponsor.getId() != null) {
             throw new BadRequestAlertException("A new sponsor cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Sponsor result = sponsorRepository.save(sponsor);
+        Sponsor result = sponsorService.save(sponsor);
         return ResponseEntity.created(new URI("/api/sponsors/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -73,7 +76,7 @@ public class SponsorResource {
         if (sponsor.getId() == null) {
             return createSponsor(sponsor);
         }
-        Sponsor result = sponsorRepository.save(sponsor);
+        Sponsor result = sponsorService.save(sponsor);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, sponsor.getId().toString()))
             .body(result);
@@ -82,22 +85,16 @@ public class SponsorResource {
     /**
      * GET  /sponsors : get all the sponsors.
      *
-     * @param filter the filter of the request
+     * @param criteria the criterias which the requested entities should match
      * @return the ResponseEntity with status 200 (OK) and the list of sponsors in body
      */
     @GetMapping("/sponsors")
     @Timed
-    public List<Sponsor> getAllSponsors(@RequestParam(required = false) String filter) {
-        if ("sponsoragreement-is-null".equals(filter)) {
-            log.debug("REST request to get all Sponsors where sponsorAgreement is null");
-            return StreamSupport
-                .stream(sponsorRepository.findAll().spliterator(), false)
-                .filter(sponsor -> sponsor.getSponsorAgreement() == null)
-                .collect(Collectors.toList());
-        }
-        log.debug("REST request to get all Sponsors");
-        return sponsorRepository.findAll();
-        }
+    public ResponseEntity<List<Sponsor>> getAllSponsors(SponsorCriteria criteria) {
+        log.debug("REST request to get Sponsors by criteria: {}", criteria);
+        List<Sponsor> entityList = sponsorQueryService.findByCriteria(criteria);
+        return ResponseEntity.ok().body(entityList);
+    }
 
     /**
      * GET  /sponsors/:id : get the "id" sponsor.
@@ -109,7 +106,7 @@ public class SponsorResource {
     @Timed
     public ResponseEntity<Sponsor> getSponsor(@PathVariable Long id) {
         log.debug("REST request to get Sponsor : {}", id);
-        Sponsor sponsor = sponsorRepository.findOne(id);
+        Sponsor sponsor = sponsorService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sponsor));
     }
 
@@ -123,7 +120,7 @@ public class SponsorResource {
     @Timed
     public ResponseEntity<Void> deleteSponsor(@PathVariable Long id) {
         log.debug("REST request to delete Sponsor : {}", id);
-        sponsorRepository.delete(id);
+        sponsorService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 }

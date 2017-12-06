@@ -3,8 +3,12 @@ package com.mycompany.myapp.web.rest;
 import com.mycompany.myapp.JhipsterApp;
 
 import com.mycompany.myapp.domain.Sponsor;
+import com.mycompany.myapp.domain.SponsorAgreement;
 import com.mycompany.myapp.repository.SponsorRepository;
+import com.mycompany.myapp.service.SponsorService;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
+import com.mycompany.myapp.service.dto.SponsorCriteria;
+import com.mycompany.myapp.service.SponsorQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +49,12 @@ public class SponsorResourceIntTest {
     private SponsorRepository sponsorRepository;
 
     @Autowired
+    private SponsorService sponsorService;
+
+    @Autowired
+    private SponsorQueryService sponsorQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -63,7 +73,7 @@ public class SponsorResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SponsorResource sponsorResource = new SponsorResource(sponsorRepository);
+        final SponsorResource sponsorResource = new SponsorResource(sponsorService, sponsorQueryService);
         this.restSponsorMockMvc = MockMvcBuilders.standaloneSetup(sponsorResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -155,6 +165,87 @@ public class SponsorResourceIntTest {
 
     @Test
     @Transactional
+    public void getAllSponsorsByNameIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sponsorRepository.saveAndFlush(sponsor);
+
+        // Get all the sponsorList where name equals to DEFAULT_NAME
+        defaultSponsorShouldBeFound("name.equals=" + DEFAULT_NAME);
+
+        // Get all the sponsorList where name equals to UPDATED_NAME
+        defaultSponsorShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        sponsorRepository.saveAndFlush(sponsor);
+
+        // Get all the sponsorList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultSponsorShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the sponsorList where name equals to UPDATED_NAME
+        defaultSponsorShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sponsorRepository.saveAndFlush(sponsor);
+
+        // Get all the sponsorList where name is not null
+        defaultSponsorShouldBeFound("name.specified=true");
+
+        // Get all the sponsorList where name is null
+        defaultSponsorShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorsBySponsorAgreementIsEqualToSomething() throws Exception {
+        // Initialize the database
+        SponsorAgreement sponsorAgreement = SponsorAgreementResourceIntTest.createEntity(em);
+        em.persist(sponsorAgreement);
+        em.flush();
+        sponsor.setSponsorAgreement(sponsorAgreement);
+        sponsorAgreement.setSponsor(sponsor);
+        sponsorRepository.saveAndFlush(sponsor);
+        Long sponsorAgreementId = sponsorAgreement.getId();
+
+        // Get all the sponsorList where sponsorAgreement equals to sponsorAgreementId
+        defaultSponsorShouldBeFound("sponsorAgreementId.equals=" + sponsorAgreementId);
+
+        // Get all the sponsorList where sponsorAgreement equals to sponsorAgreementId + 1
+        defaultSponsorShouldNotBeFound("sponsorAgreementId.equals=" + (sponsorAgreementId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultSponsorShouldBeFound(String filter) throws Exception {
+        restSponsorMockMvc.perform(get("/api/sponsors?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(sponsor.getId().intValue())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultSponsorShouldNotBeFound(String filter) throws Exception {
+        restSponsorMockMvc.perform(get("/api/sponsors?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
+
+    @Test
+    @Transactional
     public void getNonExistingSponsor() throws Exception {
         // Get the sponsor
         restSponsorMockMvc.perform(get("/api/sponsors/{id}", Long.MAX_VALUE))
@@ -165,7 +256,8 @@ public class SponsorResourceIntTest {
     @Transactional
     public void updateSponsor() throws Exception {
         // Initialize the database
-        sponsorRepository.saveAndFlush(sponsor);
+        sponsorService.save(sponsor);
+
         int databaseSizeBeforeUpdate = sponsorRepository.findAll().size();
 
         // Update the sponsor
@@ -209,7 +301,8 @@ public class SponsorResourceIntTest {
     @Transactional
     public void deleteSponsor() throws Exception {
         // Initialize the database
-        sponsorRepository.saveAndFlush(sponsor);
+        sponsorService.save(sponsor);
+
         int databaseSizeBeforeDelete = sponsorRepository.findAll().size();
 
         // Get the sponsor

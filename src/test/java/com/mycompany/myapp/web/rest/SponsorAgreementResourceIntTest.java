@@ -5,7 +5,10 @@ import com.mycompany.myapp.JhipsterApp;
 import com.mycompany.myapp.domain.SponsorAgreement;
 import com.mycompany.myapp.domain.Sponsor;
 import com.mycompany.myapp.repository.SponsorAgreementRepository;
+import com.mycompany.myapp.service.SponsorAgreementService;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
+import com.mycompany.myapp.service.dto.SponsorAgreementCriteria;
+import com.mycompany.myapp.service.SponsorAgreementQueryService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +49,12 @@ public class SponsorAgreementResourceIntTest {
     private SponsorAgreementRepository sponsorAgreementRepository;
 
     @Autowired
+    private SponsorAgreementService sponsorAgreementService;
+
+    @Autowired
+    private SponsorAgreementQueryService sponsorAgreementQueryService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -64,7 +73,7 @@ public class SponsorAgreementResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final SponsorAgreementResource sponsorAgreementResource = new SponsorAgreementResource(sponsorAgreementRepository);
+        final SponsorAgreementResource sponsorAgreementResource = new SponsorAgreementResource(sponsorAgreementService, sponsorAgreementQueryService);
         this.restSponsorAgreementMockMvc = MockMvcBuilders.standaloneSetup(sponsorAgreementResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -161,6 +170,86 @@ public class SponsorAgreementResourceIntTest {
 
     @Test
     @Transactional
+    public void getAllSponsorAgreementsByTotalIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+
+        // Get all the sponsorAgreementList where total equals to DEFAULT_TOTAL
+        defaultSponsorAgreementShouldBeFound("total.equals=" + DEFAULT_TOTAL);
+
+        // Get all the sponsorAgreementList where total equals to UPDATED_TOTAL
+        defaultSponsorAgreementShouldNotBeFound("total.equals=" + UPDATED_TOTAL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorAgreementsByTotalIsInShouldWork() throws Exception {
+        // Initialize the database
+        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+
+        // Get all the sponsorAgreementList where total in DEFAULT_TOTAL or UPDATED_TOTAL
+        defaultSponsorAgreementShouldBeFound("total.in=" + DEFAULT_TOTAL + "," + UPDATED_TOTAL);
+
+        // Get all the sponsorAgreementList where total equals to UPDATED_TOTAL
+        defaultSponsorAgreementShouldNotBeFound("total.in=" + UPDATED_TOTAL);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorAgreementsByTotalIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+
+        // Get all the sponsorAgreementList where total is not null
+        defaultSponsorAgreementShouldBeFound("total.specified=true");
+
+        // Get all the sponsorAgreementList where total is null
+        defaultSponsorAgreementShouldNotBeFound("total.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSponsorAgreementsBySponsorIsEqualToSomething() throws Exception {
+        // Initialize the database
+        Sponsor sponsor = SponsorResourceIntTest.createEntity(em);
+        em.persist(sponsor);
+        em.flush();
+        sponsorAgreement.setSponsor(sponsor);
+        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+        Long sponsorId = sponsor.getId();
+
+        // Get all the sponsorAgreementList where sponsor equals to sponsorId
+        defaultSponsorAgreementShouldBeFound("sponsorId.equals=" + sponsorId);
+
+        // Get all the sponsorAgreementList where sponsor equals to sponsorId + 1
+        defaultSponsorAgreementShouldNotBeFound("sponsorId.equals=" + (sponsorId + 1));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is returned
+     */
+    private void defaultSponsorAgreementShouldBeFound(String filter) throws Exception {
+        restSponsorAgreementMockMvc.perform(get("/api/sponsor-agreements?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(sponsorAgreement.getId().intValue())))
+            .andExpect(jsonPath("$.[*].total").value(hasItem(DEFAULT_TOTAL.doubleValue())));
+    }
+
+    /**
+     * Executes the search, and checks that the default entity is not returned
+     */
+    private void defaultSponsorAgreementShouldNotBeFound(String filter) throws Exception {
+        restSponsorAgreementMockMvc.perform(get("/api/sponsor-agreements?sort=id,desc&" + filter))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isEmpty());
+    }
+
+
+    @Test
+    @Transactional
     public void getNonExistingSponsorAgreement() throws Exception {
         // Get the sponsorAgreement
         restSponsorAgreementMockMvc.perform(get("/api/sponsor-agreements/{id}", Long.MAX_VALUE))
@@ -171,7 +260,8 @@ public class SponsorAgreementResourceIntTest {
     @Transactional
     public void updateSponsorAgreement() throws Exception {
         // Initialize the database
-        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+        sponsorAgreementService.save(sponsorAgreement);
+
         int databaseSizeBeforeUpdate = sponsorAgreementRepository.findAll().size();
 
         // Update the sponsorAgreement
@@ -215,7 +305,8 @@ public class SponsorAgreementResourceIntTest {
     @Transactional
     public void deleteSponsorAgreement() throws Exception {
         // Initialize the database
-        sponsorAgreementRepository.saveAndFlush(sponsorAgreement);
+        sponsorAgreementService.save(sponsorAgreement);
+
         int databaseSizeBeforeDelete = sponsorAgreementRepository.findAll().size();
 
         // Get the sponsorAgreement

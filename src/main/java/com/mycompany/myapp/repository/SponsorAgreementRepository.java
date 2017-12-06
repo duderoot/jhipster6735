@@ -11,6 +11,6 @@ import org.springframework.data.jpa.repository.*;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SponsorAgreementRepository extends JpaRepository<SponsorAgreement, Long> {
+public interface SponsorAgreementRepository extends JpaRepository<SponsorAgreement, Long>, JpaSpecificationExecutor<SponsorAgreement> {
 
 }
