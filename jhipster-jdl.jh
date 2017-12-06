@@ -9,3 +9,5 @@ entity SponsorAgreement {
 relationship OneToOne {
     SponsorAgreement{sponsor required} to Sponsor{sponsorAgreement}
 }
+
+filter *
