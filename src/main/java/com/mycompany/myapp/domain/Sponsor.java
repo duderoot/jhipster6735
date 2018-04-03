@@ -3,9 +3,9 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.Objects;
-
 
 /**
  * A Sponsor.

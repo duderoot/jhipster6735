@@ -42,6 +42,7 @@
                         <button type="submit"
                                 [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/edit'} }]"
                                 replaceUrl="true"
+                                queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
                             <span class="fa fa-pencil"></span>
                             <span class="d-none d-md-inline">Edit</span>
@@ -49,6 +50,7 @@
                         <button type="submit"
                                 [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/delete'} }]"
                                 replaceUrl="true"
+                                queryParamsHandling="merge"
                                 class="btn btn-danger btn-sm">
                             <span class="fa fa-remove"></span>
                             <span class="d-none d-md-inline">Delete</span>

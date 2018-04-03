@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs/Rx';
-import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs/Subscription';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { SponsorAgreement } from './sponsor-agreement.model';
 import { SponsorAgreementService } from './sponsor-agreement.service';
-import { ITEMS_PER_PAGE, Principal, ResponseWrapper } from '../../shared';
+import { Principal } from '../../shared';
 
 @Component({
     selector: 'jhi-sponsor-agreement',
@@ -26,10 +26,10 @@ sponsorAgreements: SponsorAgreement[];
 
     loadAll() {
         this.sponsorAgreementService.query().subscribe(
-            (res: ResponseWrapper) => {
-                this.sponsorAgreements = res.json;
+            (res: HttpResponse<SponsorAgreement[]>) => {
+                this.sponsorAgreements = res.body;
             },
-            (res: ResponseWrapper) => this.onError(res.json)
+            (res: HttpErrorResponse) => this.onError(res.message)
         );
     }
     ngOnInit() {
