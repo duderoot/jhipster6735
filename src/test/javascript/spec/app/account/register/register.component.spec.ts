@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, async, inject, tick, fakeAsync } from '@angular/core/testing';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 import { JhipsterTestModule } from '../../../test.module';
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from '../../../../../../main/webapp/app/shared';
@@ -66,9 +66,7 @@ describe('Component Tests', () => {
                 fakeAsync((service: Register) => {
                     spyOn(service, 'save').and.returnValue(Observable.throw({
                         status: 400,
-                        json() {
-                            return {type : LOGIN_ALREADY_USED_TYPE}
-                        }
+                        error: { type: LOGIN_ALREADY_USED_TYPE }
                     }));
                     comp.registerAccount.password = comp.confirmPassword = 'password';
 
@@ -87,9 +85,7 @@ describe('Component Tests', () => {
                 fakeAsync((service: Register) => {
                     spyOn(service, 'save').and.returnValue(Observable.throw({
                         status: 400,
-                        json() {
-                            return {type : EMAIL_ALREADY_USED_TYPE}
-                        }
+                        error: { type: EMAIL_ALREADY_USED_TYPE }
                     }));
                     comp.registerAccount.password = comp.confirmPassword = 'password';
 
