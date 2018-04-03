@@ -1,0 +1,62 @@
+<div>
+    <h2>
+        <span>Sponsor Agreements</span>
+        <button class="btn btn-primary float-right jh-create-entity create-sponsor-agreement" [routerLink]="['/', { outlets: { popup: ['sponsor-agreement-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Sponsor Agreement
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="sponsorAgreements">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span>ID</span></th>
+            <th><span>Total</span></th>
+            <th><span>Sponsor</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let sponsorAgreement of sponsorAgreements ;trackBy: trackId">
+                <td><a [routerLink]="['../sponsor-agreement', sponsorAgreement.id ]">{{sponsorAgreement.id}}</a></td>
+                <td>{{sponsorAgreement.total}}</td>
+                <td>
+                    <div *ngIf="sponsorAgreement.sponsor">
+                        <a [routerLink]="['../sponsor', sponsorAgreement.sponsor?.id ]" >{{sponsorAgreement.sponsor?.id}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../sponsor-agreement', sponsorAgreement.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/edit'} }]"
+                                replaceUrl="true"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/delete'} }]"
+                                replaceUrl="true"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
