@@ -1,22 +1,26 @@
-import { JhiEventManager } from 'ng-jhipster';
-import { HttpInterceptor, HttpRequest, HttpErrorResponse, HttpHandler, HttpEvent } from '@angular/common/http';
+import { JhiHttpInterceptor, JhiEventManager } from 'ng-jhipster';
+import { RequestOptionsArgs, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/do';
 
-export class ErrorHandlerInterceptor implements HttpInterceptor {
+export class ErrorHandlerInterceptor extends JhiHttpInterceptor {
 
     constructor(private eventManager: JhiEventManager) {
+        super();
     }
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(request).do((event: HttpEvent<any>) => {}, (err: any) => {
-            if (err instanceof HttpErrorResponse) {
-                if (!(err.status === 401 && (err.message === '' || (err.url && err.url.indexOf('/api/account') === 0)))) {
-                    if (this.eventManager !== undefined) {
-                        this.eventManager.broadcast({name: 'jhipsterApp.httpError', content: err});
-                    }
+    requestIntercept(options?: RequestOptionsArgs): RequestOptionsArgs {
+        return options;
+    }
+
+    responseIntercept(observable: Observable<Response>): Observable<Response> {
+        return <Observable<Response>> observable.catch((error) => {
+            if (!(error.status === 401 && (error.text() === '' ||
+                (error.json().path && error.json().path.indexOf('/api/account') === 0 )))) {
+                if (this.eventManager !== undefined) {
+                    this.eventManager.broadcast( {name: 'jhipsterApp.httpError', content: error});
                 }
             }
+            return Observable.throw(error);
         });
     }
 }

@@ -1,18 +1,18 @@
-import { HttpParams } from '@angular/common/http';
+import { URLSearchParams, BaseRequestOptions } from '@angular/http';
 
-export const createRequestOption = (req?: any): HttpParams => {
-    let options: HttpParams = new HttpParams();
+export const createRequestOption = (req?: any): BaseRequestOptions => {
+    const options: BaseRequestOptions = new BaseRequestOptions();
     if (req) {
-        Object.keys(req).forEach((key) => {
-            if (key !== 'sort') {
-                options = options.set(key, req[key]);
-            }
-        });
+        const params: URLSearchParams = new URLSearchParams();
+        params.set('page', req.page);
+        params.set('size', req.size);
         if (req.sort) {
-            req.sort.forEach((val) => {
-                options = options.append('sort', val);
-            });
+            params.paramsMap.set('sort', req.sort);
         }
+        params.set('query', req.query);
+        params.set('filter', req.filter);
+
+        options.params = params;
     }
     return options;
 };

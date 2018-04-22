@@ -1,67 +1,66 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { SERVER_API_URL } from '../../app.constants';
 
 import { Sponsor } from './sponsor.model';
-import { createRequestOption } from '../../shared';
-
-export type EntityResponseType = HttpResponse<Sponsor>;
+import { ResponseWrapper, createRequestOption } from '../../shared';
 
 @Injectable()
 export class SponsorService {
 
     private resourceUrl =  SERVER_API_URL + 'api/sponsors';
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: Http) { }
 
-    create(sponsor: Sponsor): Observable<EntityResponseType> {
+    create(sponsor: Sponsor): Observable<Sponsor> {
         const copy = this.convert(sponsor);
-        return this.http.post<Sponsor>(this.resourceUrl, copy, { observe: 'response' })
-            .map((res: EntityResponseType) => this.convertResponse(res));
+        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
     }
 
-    update(sponsor: Sponsor): Observable<EntityResponseType> {
+    update(sponsor: Sponsor): Observable<Sponsor> {
         const copy = this.convert(sponsor);
-        return this.http.put<Sponsor>(this.resourceUrl, copy, { observe: 'response' })
-            .map((res: EntityResponseType) => this.convertResponse(res));
+        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
     }
 
-    find(id: number): Observable<EntityResponseType> {
-        return this.http.get<Sponsor>(`${this.resourceUrl}/${id}`, { observe: 'response'})
-            .map((res: EntityResponseType) => this.convertResponse(res));
+    find(id: number): Observable<Sponsor> {
+        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
+            const jsonResponse = res.json();
+            return this.convertItemFromServer(jsonResponse);
+        });
     }
 
-    query(req?: any): Observable<HttpResponse<Sponsor[]>> {
+    query(req?: any): Observable<ResponseWrapper> {
         const options = createRequestOption(req);
-        return this.http.get<Sponsor[]>(this.resourceUrl, { params: options, observe: 'response' })
-            .map((res: HttpResponse<Sponsor[]>) => this.convertArrayResponse(res));
+        return this.http.get(this.resourceUrl, options)
+            .map((res: Response) => this.convertResponse(res));
     }
 
-    delete(id: number): Observable<HttpResponse<any>> {
-        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response'});
+    delete(id: number): Observable<Response> {
+        return this.http.delete(`${this.resourceUrl}/${id}`);
     }
 
-    private convertResponse(res: EntityResponseType): EntityResponseType {
-        const body: Sponsor = this.convertItemFromServer(res.body);
-        return res.clone({body});
-    }
-
-    private convertArrayResponse(res: HttpResponse<Sponsor[]>): HttpResponse<Sponsor[]> {
-        const jsonResponse: Sponsor[] = res.body;
-        const body: Sponsor[] = [];
+    private convertResponse(res: Response): ResponseWrapper {
+        const jsonResponse = res.json();
+        const result = [];
         for (let i = 0; i < jsonResponse.length; i++) {
-            body.push(this.convertItemFromServer(jsonResponse[i]));
+            result.push(this.convertItemFromServer(jsonResponse[i]));
         }
-        return res.clone({body});
+        return new ResponseWrapper(res.headers, result, res.status);
     }
 
     /**
      * Convert a returned JSON object to Sponsor.
      */
-    private convertItemFromServer(sponsor: Sponsor): Sponsor {
-        const copy: Sponsor = Object.assign({}, sponsor);
-        return copy;
+    private convertItemFromServer(json: any): Sponsor {
+        const entity: Sponsor = Object.assign(new Sponsor(), json);
+        return entity;
     }
 
     /**

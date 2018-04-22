@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
 import { Sponsor } from './sponsor.model';
 import { SponsorService } from './sponsor.service';
-import { Principal } from '../../shared';
+import { Principal, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-sponsor',
@@ -26,10 +25,10 @@ sponsors: Sponsor[];
 
     loadAll() {
         this.sponsorService.query().subscribe(
-            (res: HttpResponse<Sponsor[]>) => {
-                this.sponsors = res.body;
+            (res: ResponseWrapper) => {
+                this.sponsors = res.json;
             },
-            (res: HttpErrorResponse) => this.onError(res.message)
+            (res: ResponseWrapper) => this.onError(res.json)
         );
     }
     ngOnInit() {

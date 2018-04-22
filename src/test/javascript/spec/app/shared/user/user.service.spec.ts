@@ -1,73 +1,92 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, async } from '@angular/core/testing';
+import { MockBackend } from '@angular/http/testing';
+import { ConnectionBackend, RequestOptions, BaseRequestOptions, Http, Response, ResponseOptions } from '@angular/http';
 import { JhiDateUtils } from 'ng-jhipster';
 
 import { UserService, User } from './../../../../../../main/webapp/app/shared';
 import { SERVER_API_URL } from './../../../../../../main/webapp/app/app.constants';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('Service Tests', () => {
 
     describe('User Service', () => {
         let service: UserService;
-        let httpMock;
 
-        beforeEach(() => {
+        beforeEach(async(() => {
             TestBed.configureTestingModule({
-                imports: [
-                    HttpClientTestingModule
-                ],
                 providers: [
+                    {
+                        provide: ConnectionBackend,
+                        useClass: MockBackend
+                    },
+                    {
+                        provide: RequestOptions,
+                        useClass: BaseRequestOptions
+                    },
+                    Http,
                     JhiDateUtils,
                     UserService
                 ]
             });
 
             service = TestBed.get(UserService);
-            httpMock = TestBed.get(HttpTestingController);
-        });
 
-        afterEach(() => {
-            httpMock.verify();
-        });
+            this.backend = TestBed.get(ConnectionBackend) as MockBackend;
+            this.backend.connections.subscribe((connection: any) => {
+                this.lastConnection = connection;
+            });
+        }));
 
         describe('Service methods', () => {
             it('should call correct URL', () => {
                 service.find('user').subscribe(() => {});
-
-                const req  = httpMock.expectOne({ method: 'GET' });
                 const resourceUrl = SERVER_API_URL + 'api/users';
-                expect(req.request.url).toEqual(`${resourceUrl}/user`);
+
+                expect(this.lastConnection).toBeDefined();
+                expect(this.lastConnection.request.url).toEqual(`${resourceUrl}/user`);
             });
             it('should return User', () => {
 
-                service.find('user').subscribe((received) => {
-                    expect(received.body.login).toEqual('user');
+                let entity: User;
+                service.find('user').subscribe((_entity: User) => {
+                    entity = _entity;
                 });
 
-                const req = httpMock.expectOne({ method: 'GET' });
-                req.flush(new User(1, 'user'));
+                this.lastConnection.mockRespond(new Response(new ResponseOptions({
+                    body: JSON.stringify(new User(1, 'user')),
+                })));
+
+                expect(entity).toBeDefined();
+                expect(entity.login).toEqual('user');
             });
 
             it('should return Authorities', () => {
 
+                let authorities;
                 service.authorities().subscribe((_authorities) => {
-                    expect(_authorities).toEqual(['ROLE_USER', 'ROLE_ADMIN']);
+                    authorities = _authorities;
                 });
-                const req = httpMock.expectOne({ method: 'GET' });
 
-                req.flush(['ROLE_USER', 'ROLE_ADMIN']);
+                this.lastConnection.mockRespond(new Response(new ResponseOptions({
+                    body: JSON.stringify(['ROLE_USER', 'ROLE_ADMIN']),
+                })));
+
+                expect(authorities).toBeDefined();
+                expect(authorities).toEqual(['ROLE_USER', 'ROLE_ADMIN']);
             });
 
             it('should propagate not found response', () => {
 
+                let error: any;
                 service.find('user').subscribe(null, (_error: any) => {
-                    expect(_error.status).toEqual(404);
+                    error = _error;
                 });
 
-                const req  = httpMock.expectOne({ method: 'GET' });
-                req.flush('Invalid request parameters', {
-                    status: 404, statusText: 'Bad Request'
-                });
+                this.lastConnection.mockError(new Response(new ResponseOptions({
+                    status: 404,
+                })));
+
+                expect(error).toBeDefined();
+                expect(error.status).toEqual(404);
             });
         });
     });
