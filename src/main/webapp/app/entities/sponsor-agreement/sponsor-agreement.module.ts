@@ -1,49 +1,37 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import { JhipsterSharedModule } from '../../shared';
+import { JhipsterSharedModule } from 'app/shared';
 import {
     SponsorAgreementService,
-    SponsorAgreementPopupService,
     SponsorAgreementComponent,
     SponsorAgreementDetailComponent,
-    SponsorAgreementDialogComponent,
-    SponsorAgreementPopupComponent,
+    SponsorAgreementUpdateComponent,
     SponsorAgreementDeletePopupComponent,
     SponsorAgreementDeleteDialogComponent,
     sponsorAgreementRoute,
     sponsorAgreementPopupRoute,
+    SponsorAgreementResolve
 } from './';
 
-const ENTITY_STATES = [
-    ...sponsorAgreementRoute,
-    ...sponsorAgreementPopupRoute,
-];
+const ENTITY_STATES = [...sponsorAgreementRoute, ...sponsorAgreementPopupRoute];
 
 @NgModule({
-    imports: [
-        JhipsterSharedModule,
-        RouterModule.forChild(ENTITY_STATES)
-    ],
+    imports: [JhipsterSharedModule, RouterModule.forChild(ENTITY_STATES)],
     declarations: [
         SponsorAgreementComponent,
         SponsorAgreementDetailComponent,
-        SponsorAgreementDialogComponent,
+        SponsorAgreementUpdateComponent,
         SponsorAgreementDeleteDialogComponent,
-        SponsorAgreementPopupComponent,
-        SponsorAgreementDeletePopupComponent,
+        SponsorAgreementDeletePopupComponent
     ],
     entryComponents: [
         SponsorAgreementComponent,
-        SponsorAgreementDialogComponent,
-        SponsorAgreementPopupComponent,
+        SponsorAgreementUpdateComponent,
         SponsorAgreementDeleteDialogComponent,
-        SponsorAgreementDeletePopupComponent,
+        SponsorAgreementDeletePopupComponent
     ],
-    providers: [
-        SponsorAgreementService,
-        SponsorAgreementPopupService,
-    ],
+    providers: [SponsorAgreementService, SponsorAgreementResolve],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class JhipsterSponsorAgreementModule {}

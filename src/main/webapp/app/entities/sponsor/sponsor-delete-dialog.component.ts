@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { JhiEventManager } from 'ng-jhipster';
 
-import { Sponsor } from './sponsor.model';
-import { SponsorPopupService } from './sponsor-popup.service';
+import { ISponsor } from 'app/shared/model/sponsor.model';
 import { SponsorService } from './sponsor.service';
 
 @Component({
@@ -13,22 +12,16 @@ import { SponsorService } from './sponsor.service';
     templateUrl: './sponsor-delete-dialog.component.html'
 })
 export class SponsorDeleteDialogComponent {
+    sponsor: ISponsor;
 
-    sponsor: Sponsor;
-
-    constructor(
-        private sponsorService: SponsorService,
-        public activeModal: NgbActiveModal,
-        private eventManager: JhiEventManager
-    ) {
-    }
+    constructor(private sponsorService: SponsorService, public activeModal: NgbActiveModal, private eventManager: JhiEventManager) {}
 
     clear() {
         this.activeModal.dismiss('cancel');
     }
 
     confirmDelete(id: number) {
-        this.sponsorService.delete(id).subscribe((response) => {
+        this.sponsorService.delete(id).subscribe(response => {
             this.eventManager.broadcast({
                 name: 'sponsorListModification',
                 content: 'Deleted an sponsor'
@@ -43,22 +36,30 @@ export class SponsorDeleteDialogComponent {
     template: ''
 })
 export class SponsorDeletePopupComponent implements OnInit, OnDestroy {
+    private ngbModalRef: NgbModalRef;
 
-    routeSub: any;
-
-    constructor(
-        private route: ActivatedRoute,
-        private sponsorPopupService: SponsorPopupService
-    ) {}
+    constructor(private route: ActivatedRoute, private router: Router, private modalService: NgbModal) {}
 
     ngOnInit() {
-        this.routeSub = this.route.params.subscribe((params) => {
-            this.sponsorPopupService
-                .open(SponsorDeleteDialogComponent as Component, params['id']);
+        this.route.data.subscribe(({ sponsor }) => {
+            setTimeout(() => {
+                this.ngbModalRef = this.modalService.open(SponsorDeleteDialogComponent as Component, { size: 'lg', backdrop: 'static' });
+                this.ngbModalRef.componentInstance.sponsor = sponsor.body;
+                this.ngbModalRef.result.then(
+                    result => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    },
+                    reason => {
+                        this.router.navigate([{ outlets: { popup: null } }], { replaceUrl: true, queryParamsHandling: 'merge' });
+                        this.ngbModalRef = null;
+                    }
+                );
+            }, 0);
         });
     }
 
     ngOnDestroy() {
-        this.routeSub.unsubscribe();
+        this.ngbModalRef = null;
     }
 }

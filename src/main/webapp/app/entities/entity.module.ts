@@ -5,6 +5,7 @@ import { JhipsterSponsorAgreementModule } from './sponsor-agreement/sponsor-agre
 /* jhipster-needle-add-entity-module-import - JHipster will add entity modules imports here */
 
 @NgModule({
+    // prettier-ignore
     imports: [
         JhipsterSponsorModule,
         JhipsterSponsorAgreementModule,

@@ -1,51 +1,40 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs/observable/of';
 
 import { JhipsterTestModule } from '../../../test.module';
-import { SponsorAgreementDetailComponent } from '../../../../../../main/webapp/app/entities/sponsor-agreement/sponsor-agreement-detail.component';
-import { SponsorAgreementService } from '../../../../../../main/webapp/app/entities/sponsor-agreement/sponsor-agreement.service';
-import { SponsorAgreement } from '../../../../../../main/webapp/app/entities/sponsor-agreement/sponsor-agreement.model';
+import { SponsorAgreementDetailComponent } from 'app/entities/sponsor-agreement/sponsor-agreement-detail.component';
+import { SponsorAgreement } from 'app/shared/model/sponsor-agreement.model';
 
 describe('Component Tests', () => {
-
     describe('SponsorAgreement Management Detail Component', () => {
         let comp: SponsorAgreementDetailComponent;
         let fixture: ComponentFixture<SponsorAgreementDetailComponent>;
-        let service: SponsorAgreementService;
+        const route = ({ data: of({ sponsorAgreement: new SponsorAgreement(123) }) } as any) as ActivatedRoute;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [JhipsterTestModule],
                 declarations: [SponsorAgreementDetailComponent],
-                providers: [
-                    SponsorAgreementService
-                ]
+                providers: [{ provide: ActivatedRoute, useValue: route }]
             })
-            .overrideTemplate(SponsorAgreementDetailComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(SponsorAgreementDetailComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(SponsorAgreementDetailComponent);
             comp = fixture.componentInstance;
-            service = fixture.debugElement.injector.get(SponsorAgreementService);
         });
 
         describe('OnInit', () => {
             it('Should call load all on init', () => {
                 // GIVEN
 
-                spyOn(service, 'find').and.returnValue(Observable.of(new SponsorAgreement(123)));
-
                 // WHEN
                 comp.ngOnInit();
 
                 // THEN
-                expect(service.find).toHaveBeenCalledWith(123);
-                expect(comp.sponsorAgreement).toEqual(jasmine.objectContaining({id: 123}));
+                expect(comp.sponsorAgreement).toEqual(jasmine.objectContaining({ id: 123 }));
             });
         });
     });
-
 });

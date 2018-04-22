@@ -1,73 +1,78 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { SERVER_API_URL } from '../../app.constants';
 
-import { SponsorAgreement } from './sponsor-agreement.model';
-import { ResponseWrapper, createRequestOption } from '../../shared';
+import { SERVER_API_URL } from 'app/app.constants';
+import { createRequestOption } from 'app/shared';
+import { ISponsorAgreement } from 'app/shared/model/sponsor-agreement.model';
+
+export type EntityResponseType = HttpResponse<ISponsorAgreement>;
+export type EntityArrayResponseType = HttpResponse<ISponsorAgreement[]>;
 
 @Injectable()
 export class SponsorAgreementService {
+    private resourceUrl = SERVER_API_URL + 'api/sponsor-agreements';
 
-    private resourceUrl =  SERVER_API_URL + 'api/sponsor-agreements';
+    constructor(private http: HttpClient) {}
 
-    constructor(private http: Http) { }
-
-    create(sponsorAgreement: SponsorAgreement): Observable<SponsorAgreement> {
+    create(sponsorAgreement: ISponsorAgreement): Observable<EntityResponseType> {
         const copy = this.convert(sponsorAgreement);
-        return this.http.post(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+        return this.http
+            .post<ISponsorAgreement>(this.resourceUrl, copy, { observe: 'response' })
+            .map((res: EntityResponseType) => this.convertResponse(res));
     }
 
-    update(sponsorAgreement: SponsorAgreement): Observable<SponsorAgreement> {
+    update(sponsorAgreement: ISponsorAgreement): Observable<EntityResponseType> {
         const copy = this.convert(sponsorAgreement);
-        return this.http.put(this.resourceUrl, copy).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+        return this.http
+            .put<ISponsorAgreement>(this.resourceUrl, copy, { observe: 'response' })
+            .map((res: EntityResponseType) => this.convertResponse(res));
     }
 
-    find(id: number): Observable<SponsorAgreement> {
-        return this.http.get(`${this.resourceUrl}/${id}`).map((res: Response) => {
-            const jsonResponse = res.json();
-            return this.convertItemFromServer(jsonResponse);
-        });
+    find(id: number): Observable<EntityResponseType> {
+        return this.http
+            .get<ISponsorAgreement>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+            .map((res: EntityResponseType) => this.convertResponse(res));
     }
 
-    query(req?: any): Observable<ResponseWrapper> {
+    query(req?: any): Observable<EntityArrayResponseType> {
         const options = createRequestOption(req);
-        return this.http.get(this.resourceUrl, options)
-            .map((res: Response) => this.convertResponse(res));
+        return this.http
+            .get<ISponsorAgreement[]>(this.resourceUrl, { params: options, observe: 'response' })
+            .map((res: EntityArrayResponseType) => this.convertArrayResponse(res));
     }
 
-    delete(id: number): Observable<Response> {
-        return this.http.delete(`${this.resourceUrl}/${id}`);
+    delete(id: number): Observable<HttpResponse<any>> {
+        return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    private convertResponse(res: Response): ResponseWrapper {
-        const jsonResponse = res.json();
-        const result = [];
+    private convertResponse(res: EntityResponseType): EntityResponseType {
+        const body: ISponsorAgreement = this.convertItemFromServer(res.body);
+        return res.clone({ body });
+    }
+
+    private convertArrayResponse(res: EntityArrayResponseType): EntityArrayResponseType {
+        const jsonResponse: ISponsorAgreement[] = res.body;
+        const body: ISponsorAgreement[] = [];
         for (let i = 0; i < jsonResponse.length; i++) {
-            result.push(this.convertItemFromServer(jsonResponse[i]));
+            body.push(this.convertItemFromServer(jsonResponse[i]));
         }
-        return new ResponseWrapper(res.headers, result, res.status);
+        return res.clone({ body });
     }
 
     /**
      * Convert a returned JSON object to SponsorAgreement.
      */
-    private convertItemFromServer(json: any): SponsorAgreement {
-        const entity: SponsorAgreement = Object.assign(new SponsorAgreement(), json);
-        return entity;
+    private convertItemFromServer(sponsorAgreement: ISponsorAgreement): ISponsorAgreement {
+        const copy: ISponsorAgreement = Object.assign({}, sponsorAgreement, {});
+        return copy;
     }
 
     /**
      * Convert a SponsorAgreement to a JSON which can be sent to the server.
      */
-    private convert(sponsorAgreement: SponsorAgreement): SponsorAgreement {
-        const copy: SponsorAgreement = Object.assign({}, sponsorAgreement);
+    private convert(sponsorAgreement: ISponsorAgreement): ISponsorAgreement {
+        const copy: ISponsorAgreement = Object.assign({}, sponsorAgreement, {});
         return copy;
     }
 }

@@ -1,32 +1,33 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="sponsorAgreement">
+            <h2><span>Sponsor Agreement</span> {{sponsorAgreement.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span>Total</span></dt>
+                <dd>
+                    <span>{{sponsorAgreement.total}}</span>
+                </dd>
+                <dt><span>Sponsor</span></dt>
+                <dd>
+                    <div *ngIf="sponsorAgreement.sponsor">
+                        <a [routerLink]="['/sponsor', sponsorAgreement.sponsor?.id, 'view']">{{sponsorAgreement.sponsor?.id}}</a>
+                    </div>
+                </dd>
+            </dl>
 
-<div *ngIf="sponsorAgreement">
-    <h2><span>Sponsor Agreement</span> {{sponsorAgreement.id}}</h2>
-    <hr>
-    <jhi-alert-error></jhi-alert-error>
-    <dl class="row-md jh-entity-details">
-        <dt><span>Total</span></dt>
-        <dd>
-            <span>{{sponsorAgreement.total}}</span>
-        </dd>
-        <dt><span>Sponsor</span></dt>
-        <dd>
-            <div *ngIf="sponsorAgreement.sponsor">
-                <a [routerLink]="['/sponsor', sponsorAgreement.sponsor?.id]">{{sponsorAgreement.sponsor?.id}}</a>
-            </div>
-        </dd>
-    </dl>
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+            </button>
 
-    <button type="submit"
-            (click)="previousState()"
-            class="btn btn-info">
-        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
-    </button>
-
-    <button type="button"
-            [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/edit'} }]"
-            replaceUrl="true"
-            queryParamsHandling="merge"
-            class="btn btn-primary">
-        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
-    </button>
+            <button type="button"
+                    [routerLink]="['/sponsor-agreement', sponsorAgreement.id, 'edit']"
+                    class="btn btn-primary">
+                <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+            </button>
+        </div>
+    </div>
 </div>

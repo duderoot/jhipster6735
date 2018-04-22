@@ -1,13 +1,12 @@
 package com.mycompany.myapp.service;
 
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,7 @@ import com.mycompany.myapp.service.dto.SponsorCriteria;
 
 /**
  * Service for executing complex queries for Sponsor entities in the database.
- * The main input is a {@link SponsorCriteria} which get's converted to {@link Specifications},
+ * The main input is a {@link SponsorCriteria} which gets converted to {@link Specification},
  * in a way that all the filters must apply.
  * It returns a {@link List} of {@link Sponsor} or a {@link Page} of {@link Sponsor} which fulfills the criteria.
  */
@@ -30,7 +29,6 @@ import com.mycompany.myapp.service.dto.SponsorCriteria;
 public class SponsorQueryService extends QueryService<Sponsor> {
 
     private final Logger log = LoggerFactory.getLogger(SponsorQueryService.class);
-
 
     private final SponsorRepository sponsorRepository;
 
@@ -46,7 +44,7 @@ public class SponsorQueryService extends QueryService<Sponsor> {
     @Transactional(readOnly = true)
     public List<Sponsor> findByCriteria(SponsorCriteria criteria) {
         log.debug("find by criteria : {}", criteria);
-        final Specifications<Sponsor> specification = createSpecification(criteria);
+        final Specification<Sponsor> specification = createSpecification(criteria);
         return sponsorRepository.findAll(specification);
     }
 
@@ -59,15 +57,15 @@ public class SponsorQueryService extends QueryService<Sponsor> {
     @Transactional(readOnly = true)
     public Page<Sponsor> findByCriteria(SponsorCriteria criteria, Pageable page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
-        final Specifications<Sponsor> specification = createSpecification(criteria);
+        final Specification<Sponsor> specification = createSpecification(criteria);
         return sponsorRepository.findAll(specification, page);
     }
 
     /**
-     * Function to convert SponsorCriteria to a {@link Specifications}
+     * Function to convert SponsorCriteria to a {@link Specification}
      */
-    private Specifications<Sponsor> createSpecification(SponsorCriteria criteria) {
-        Specifications<Sponsor> specification = Specifications.where(null);
+    private Specification<Sponsor> createSpecification(SponsorCriteria criteria) {
+        Specification<Sponsor> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
                 specification = specification.and(buildSpecification(criteria.getId(), Sponsor_.id));

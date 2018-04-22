@@ -106,8 +106,8 @@ public class SponsorAgreementResource {
     @Timed
     public ResponseEntity<SponsorAgreement> getSponsorAgreement(@PathVariable Long id) {
         log.debug("REST request to get SponsorAgreement : {}", id);
-        SponsorAgreement sponsorAgreement = sponsorAgreementService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sponsorAgreement));
+        Optional<SponsorAgreement> sponsorAgreement = sponsorAgreementService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(sponsorAgreement);
     }
 
     /**

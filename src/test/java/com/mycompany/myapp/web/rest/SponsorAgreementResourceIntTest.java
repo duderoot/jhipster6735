@@ -13,6 +13,7 @@ import com.mycompany.myapp.service.SponsorAgreementQueryService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.ArrayList;
 
 import static com.mycompany.myapp.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +49,9 @@ public class SponsorAgreementResourceIntTest {
 
     @Autowired
     private SponsorAgreementRepository sponsorAgreementRepository;
+
+
+    
 
     @Autowired
     private SponsorAgreementService sponsorAgreementService;
@@ -153,6 +158,7 @@ public class SponsorAgreementResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(sponsorAgreement.getId().intValue())))
             .andExpect(jsonPath("$.[*].total").value(hasItem(DEFAULT_TOTAL.doubleValue())));
     }
+    
 
     @Test
     @Transactional
@@ -265,7 +271,7 @@ public class SponsorAgreementResourceIntTest {
         int databaseSizeBeforeUpdate = sponsorAgreementRepository.findAll().size();
 
         // Update the sponsorAgreement
-        SponsorAgreement updatedSponsorAgreement = sponsorAgreementRepository.findOne(sponsorAgreement.getId());
+        SponsorAgreement updatedSponsorAgreement = sponsorAgreementRepository.findById(sponsorAgreement.getId()).get();
         // Disconnect from session so that the updates on updatedSponsorAgreement are not directly saved in db
         em.detach(updatedSponsorAgreement);
         updatedSponsorAgreement

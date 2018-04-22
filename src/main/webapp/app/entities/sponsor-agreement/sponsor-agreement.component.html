@@ -1,7 +1,7 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Sponsor Agreements</span>
-        <button class="btn btn-primary float-right jh-create-entity create-sponsor-agreement" [routerLink]="['/', { outlets: { popup: ['sponsor-agreement-new'] } }]">
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-sponsor-agreement" [routerLink]="['/sponsor-agreement/new']">
             <span class="fa fa-plus"></span>
             <span >
             Create new Sponsor Agreement
@@ -9,8 +9,6 @@
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="sponsorAgreements">
         <table class="table table-striped">
@@ -24,25 +22,23 @@
             </thead>
             <tbody>
             <tr *ngFor="let sponsorAgreement of sponsorAgreements ;trackBy: trackId">
-                <td><a [routerLink]="['../sponsor-agreement', sponsorAgreement.id ]">{{sponsorAgreement.id}}</a></td>
+                <td><a [routerLink]="['/sponsor-agreement', sponsorAgreement.id, 'view' ]">{{sponsorAgreement.id}}</a></td>
                 <td>{{sponsorAgreement.total}}</td>
                 <td>
                     <div *ngIf="sponsorAgreement.sponsor">
-                        <a [routerLink]="['../sponsor', sponsorAgreement.sponsor?.id ]" >{{sponsorAgreement.sponsor?.id}}</a>
+                        <a [routerLink]="['../sponsor', sponsorAgreement.sponsor?.id, 'view' ]" >{{sponsorAgreement.sponsor?.id}}</a>
                     </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../sponsor-agreement', sponsorAgreement.id ]"
+                                [routerLink]="['/sponsor-agreement', sponsorAgreement.id, 'view' ]"
                                 class="btn btn-info btn-sm">
                             <span class="fa fa-eye"></span>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'sponsor-agreement/'+ sponsorAgreement.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/sponsor-agreement', sponsorAgreement.id, 'edit']"
                                 class="btn btn-primary btn-sm">
                             <span class="fa fa-pencil"></span>
                             <span class="d-none d-md-inline">Edit</span>

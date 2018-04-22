@@ -106,8 +106,8 @@ public class SponsorResource {
     @Timed
     public ResponseEntity<Sponsor> getSponsor(@PathVariable Long id) {
         log.debug("REST request to get Sponsor : {}", id);
-        Sponsor sponsor = sponsorService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sponsor));
+        Optional<Sponsor> sponsor = sponsorService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(sponsor);
     }
 
     /**
