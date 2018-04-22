@@ -3,7 +3,7 @@
     "promptValues": {
       "packageName": "com.mycompany.myapp"
     },
-    "jhipsterVersion": "4.13.3",
+    "jhipsterVersion": "5.0.0-beta.0",
     "baseName": "jhipster",
     "packageName": "com.mycompany.myapp",
     "packageFolder": "com/mycompany/myapp",
@@ -30,6 +30,7 @@
     "jhiPrefix": "jhi",
     "enableTranslation": false,
     "cacheProvider": "no",
-    "enableHibernateCache": false
+    "enableHibernateCache": false,
+    "reactive": false
   }
 }

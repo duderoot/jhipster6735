@@ -1,15 +1,14 @@
 /* tslint:disable max-line-length */
-import { ComponentFixture, TestBed, async, inject, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs/Observable';
 import { JhiEventManager } from 'ng-jhipster';
 
 import { JhipsterTestModule } from '../../../test.module';
-import { SponsorAgreementDeleteDialogComponent } from '../../../../../../main/webapp/app/entities/sponsor-agreement/sponsor-agreement-delete-dialog.component';
-import { SponsorAgreementService } from '../../../../../../main/webapp/app/entities/sponsor-agreement/sponsor-agreement.service';
+import { SponsorAgreementDeleteDialogComponent } from 'app/entities/sponsor-agreement/sponsor-agreement-delete-dialog.component';
+import { SponsorAgreementService } from 'app/entities/sponsor-agreement/sponsor-agreement.service';
 
 describe('Component Tests', () => {
-
     describe('SponsorAgreement Management Delete Component', () => {
         let comp: SponsorAgreementDeleteDialogComponent;
         let fixture: ComponentFixture<SponsorAgreementDeleteDialogComponent>;
@@ -17,19 +16,14 @@ describe('Component Tests', () => {
         let mockEventManager: any;
         let mockActiveModal: any;
 
-        beforeEach(async(() => {
+        beforeEach(() => {
             TestBed.configureTestingModule({
                 imports: [JhipsterTestModule],
                 declarations: [SponsorAgreementDeleteDialogComponent],
-                providers: [
-                    SponsorAgreementService
-                ]
+                providers: [SponsorAgreementService]
             })
-            .overrideTemplate(SponsorAgreementDeleteDialogComponent, '')
-            .compileComponents();
-        }));
-
-        beforeEach(() => {
+                .overrideTemplate(SponsorAgreementDeleteDialogComponent, '')
+                .compileComponents();
             fixture = TestBed.createComponent(SponsorAgreementDeleteDialogComponent);
             comp = fixture.componentInstance;
             service = fixture.debugElement.injector.get(SponsorAgreementService);
@@ -38,8 +32,10 @@ describe('Component Tests', () => {
         });
 
         describe('confirmDelete', () => {
-            it('Should call delete service on confirmDelete',
-                inject([],
+            it(
+                'Should call delete service on confirmDelete',
+                inject(
+                    [],
                     fakeAsync(() => {
                         // GIVEN
                         spyOn(service, 'delete').and.returnValue(Observable.of({}));
@@ -57,5 +53,4 @@ describe('Component Tests', () => {
             );
         });
     });
-
 });

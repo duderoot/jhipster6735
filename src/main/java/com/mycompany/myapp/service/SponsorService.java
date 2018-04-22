@@ -4,13 +4,15 @@ import com.mycompany.myapp.domain.Sponsor;
 import com.mycompany.myapp.repository.SponsorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 /**
  * Service Implementation for managing Sponsor.
  */
@@ -49,6 +51,7 @@ public class SponsorService {
     }
 
 
+
     /**
      *  get all the sponsors where SponsorAgreement is null.
      *  @return the list of entities
@@ -69,9 +72,9 @@ public class SponsorService {
      * @return the entity
      */
     @Transactional(readOnly = true)
-    public Sponsor findOne(Long id) {
+    public Optional<Sponsor> findOne(Long id) {
         log.debug("Request to get Sponsor : {}", id);
-        return sponsorRepository.findOne(id);
+        return sponsorRepository.findById(id);
     }
 
     /**
@@ -81,6 +84,6 @@ public class SponsorService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Sponsor : {}", id);
-        sponsorRepository.delete(id);
+        sponsorRepository.deleteById(id);
     }
 }

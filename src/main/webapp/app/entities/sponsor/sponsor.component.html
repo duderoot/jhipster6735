@@ -1,7 +1,7 @@
 <div>
-    <h2>
+    <h2 id="page-heading">
         <span>Sponsors</span>
-        <button class="btn btn-primary float-right jh-create-entity create-sponsor" [routerLink]="['/', { outlets: { popup: ['sponsor-new'] } }]">
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-sponsor" [routerLink]="['/sponsor/new']">
             <span class="fa fa-plus"></span>
             <span >
             Create new Sponsor
@@ -9,8 +9,6 @@
         </button>
     </h2>
     <jhi-alert></jhi-alert>
-    <div class="row">
-    </div>
     <br/>
     <div class="table-responsive" *ngIf="sponsors">
         <table class="table table-striped">
@@ -23,20 +21,18 @@
             </thead>
             <tbody>
             <tr *ngFor="let sponsor of sponsors ;trackBy: trackId">
-                <td><a [routerLink]="['../sponsor', sponsor.id ]">{{sponsor.id}}</a></td>
+                <td><a [routerLink]="['/sponsor', sponsor.id, 'view' ]">{{sponsor.id}}</a></td>
                 <td>{{sponsor.name}}</td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['../sponsor', sponsor.id ]"
+                                [routerLink]="['/sponsor', sponsor.id, 'view' ]"
                                 class="btn btn-info btn-sm">
                             <span class="fa fa-eye"></span>
                             <span class="d-none d-md-inline">View</span>
                         </button>
                         <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'sponsor/'+ sponsor.id + '/edit'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
+                                [routerLink]="['/sponsor', sponsor.id, 'edit']"
                                 class="btn btn-primary btn-sm">
                             <span class="fa fa-pencil"></span>
                             <span class="d-none d-md-inline">Edit</span>

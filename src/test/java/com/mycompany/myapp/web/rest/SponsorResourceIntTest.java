@@ -13,6 +13,7 @@ import com.mycompany.myapp.service.SponsorQueryService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.ArrayList;
 
 import static com.mycompany.myapp.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +49,9 @@ public class SponsorResourceIntTest {
 
     @Autowired
     private SponsorRepository sponsorRepository;
+
+
+    
 
     @Autowired
     private SponsorService sponsorService;
@@ -148,6 +153,7 @@ public class SponsorResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(sponsor.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
+    
 
     @Test
     @Transactional
@@ -261,7 +267,7 @@ public class SponsorResourceIntTest {
         int databaseSizeBeforeUpdate = sponsorRepository.findAll().size();
 
         // Update the sponsor
-        Sponsor updatedSponsor = sponsorRepository.findOne(sponsor.getId());
+        Sponsor updatedSponsor = sponsorRepository.findById(sponsor.getId()).get();
         // Disconnect from session so that the updates on updatedSponsor are not directly saved in db
         em.detach(updatedSponsor);
         updatedSponsor

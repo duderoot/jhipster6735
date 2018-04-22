@@ -4,11 +4,13 @@ import com.mycompany.myapp.domain.SponsorAgreement;
 import com.mycompany.myapp.repository.SponsorAgreementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
+import java.util.List;
 /**
  * Service Implementation for managing SponsorAgreement.
  */
@@ -46,6 +48,7 @@ public class SponsorAgreementService {
         return sponsorAgreementRepository.findAll();
     }
 
+
     /**
      * Get one sponsorAgreement by id.
      *
@@ -53,9 +56,9 @@ public class SponsorAgreementService {
      * @return the entity
      */
     @Transactional(readOnly = true)
-    public SponsorAgreement findOne(Long id) {
+    public Optional<SponsorAgreement> findOne(Long id) {
         log.debug("Request to get SponsorAgreement : {}", id);
-        return sponsorAgreementRepository.findOne(id);
+        return sponsorAgreementRepository.findById(id);
     }
 
     /**
@@ -65,6 +68,6 @@ public class SponsorAgreementService {
      */
     public void delete(Long id) {
         log.debug("Request to delete SponsorAgreement : {}", id);
-        sponsorAgreementRepository.delete(id);
+        sponsorAgreementRepository.deleteById(id);
     }
 }

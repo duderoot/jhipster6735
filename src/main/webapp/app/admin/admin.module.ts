@@ -1,17 +1,16 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
-import { JhipsterSharedModule } from '../shared';
+import { JhipsterSharedModule } from 'app/shared';
 /* jhipster-needle-add-admin-module-import - JHipster will add admin modules imports here */
 
 import {
     adminState,
+    AuditResolvePagingParams,
     AuditsComponent,
-    UserMgmtComponent,
-    UserDialogComponent,
     UserDeleteDialogComponent,
+    UserMgmtComponent,
     UserMgmtDetailComponent,
-    UserMgmtDialogComponent,
+    UserMgmtUpdateComponent,
     UserMgmtDeleteDialogComponent,
     LogsComponent,
     JhiMetricsMonitoringModalComponent,
@@ -26,23 +25,22 @@ import {
     JhiMetricsService,
     LogsService,
     UserResolvePagingParams,
-    UserResolve,
-    UserModalService
+    UserMgmtResolve,
+    UserResolve
 } from './';
 
 @NgModule({
     imports: [
         JhipsterSharedModule,
-        RouterModule.forChild(adminState),
+        RouterModule.forChild(adminState)
         /* jhipster-needle-add-admin-module - JHipster will add admin modules here */
     ],
     declarations: [
         AuditsComponent,
-        UserMgmtComponent,
-        UserDialogComponent,
         UserDeleteDialogComponent,
+        UserMgmtComponent,
         UserMgmtDetailComponent,
-        UserMgmtDialogComponent,
+        UserMgmtUpdateComponent,
         UserMgmtDeleteDialogComponent,
         LogsComponent,
         JhiConfigurationComponent,
@@ -52,13 +50,9 @@ import {
         JhiMetricsMonitoringComponent,
         JhiMetricsMonitoringModalComponent
     ],
-    entryComponents: [
-        UserMgmtDialogComponent,
-        UserMgmtDeleteDialogComponent,
-        JhiHealthModalComponent,
-        JhiMetricsMonitoringModalComponent,
-    ],
+    entryComponents: [UserMgmtUpdateComponent, UserMgmtDeleteDialogComponent, JhiHealthModalComponent, JhiMetricsMonitoringModalComponent],
     providers: [
+        AuditResolvePagingParams,
         AuditsService,
         JhiConfigurationService,
         JhiHealthService,
@@ -66,7 +60,7 @@ import {
         LogsService,
         UserResolvePagingParams,
         UserResolve,
-        UserModalService
+        UserMgmtResolve
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

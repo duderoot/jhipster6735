@@ -1,5 +1,5 @@
 # jhipster
-This application was generated using JHipster 4.13.3, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.13.3](http://www.jhipster.tech/documentation-archive/v4.13.3).
+This application was generated using JHipster 5.0.0-beta.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0](https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0).
 
 ## Development
 
@@ -16,7 +16,6 @@ You will only need to run this command when dependencies change in [package.json
     yarn install
 
 We use yarn scripts and [Webpack][] as our build system.
-
 
 Run the following commands in two separate terminals to create a blissful development experience where your browser
 auto-refreshes when files change on your hard drive.
@@ -145,14 +144,14 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
-[JHipster Homepage and latest documentation]: http://www.jhipster.tech
-[JHipster 4.13.3 archive]: http://www.jhipster.tech/documentation-archive/v4.13.3
+[JHipster Homepage and latest documentation]: https://www.jhipster.tech
+[JHipster 5.0.0-beta.0 archive]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0
 
-[Using JHipster in development]: http://www.jhipster.tech/documentation-archive/v4.13.3/development/
-[Using Docker and Docker-Compose]: http://www.jhipster.tech/documentation-archive/v4.13.3/docker-compose
-[Using JHipster in production]: http://www.jhipster.tech/documentation-archive/v4.13.3/production/
-[Running tests page]: http://www.jhipster.tech/documentation-archive/v4.13.3/running-tests/
-[Setting up Continuous Integration]: http://www.jhipster.tech/documentation-archive/v4.13.3/setting-up-ci/
+[Using JHipster in development]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0/development/
+[Using Docker and Docker-Compose]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0/docker-compose
+[Using JHipster in production]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0/production/
+[Running tests page]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0/running-tests/
+[Setting up Continuous Integration]: https://www.jhipster.tech/documentation-archive/v5.0.0-beta.0/setting-up-ci/
 
 
 [Node.js]: https://nodejs.org/

@@ -1,13 +1,12 @@
 package com.mycompany.myapp.service;
 
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,7 @@ import com.mycompany.myapp.service.dto.SponsorAgreementCriteria;
 
 /**
  * Service for executing complex queries for SponsorAgreement entities in the database.
- * The main input is a {@link SponsorAgreementCriteria} which get's converted to {@link Specifications},
+ * The main input is a {@link SponsorAgreementCriteria} which gets converted to {@link Specification},
  * in a way that all the filters must apply.
  * It returns a {@link List} of {@link SponsorAgreement} or a {@link Page} of {@link SponsorAgreement} which fulfills the criteria.
  */
@@ -30,7 +29,6 @@ import com.mycompany.myapp.service.dto.SponsorAgreementCriteria;
 public class SponsorAgreementQueryService extends QueryService<SponsorAgreement> {
 
     private final Logger log = LoggerFactory.getLogger(SponsorAgreementQueryService.class);
-
 
     private final SponsorAgreementRepository sponsorAgreementRepository;
 
@@ -46,7 +44,7 @@ public class SponsorAgreementQueryService extends QueryService<SponsorAgreement>
     @Transactional(readOnly = true)
     public List<SponsorAgreement> findByCriteria(SponsorAgreementCriteria criteria) {
         log.debug("find by criteria : {}", criteria);
-        final Specifications<SponsorAgreement> specification = createSpecification(criteria);
+        final Specification<SponsorAgreement> specification = createSpecification(criteria);
         return sponsorAgreementRepository.findAll(specification);
     }
 
@@ -59,15 +57,15 @@ public class SponsorAgreementQueryService extends QueryService<SponsorAgreement>
     @Transactional(readOnly = true)
     public Page<SponsorAgreement> findByCriteria(SponsorAgreementCriteria criteria, Pageable page) {
         log.debug("find by criteria : {}, page: {}", criteria, page);
-        final Specifications<SponsorAgreement> specification = createSpecification(criteria);
+        final Specification<SponsorAgreement> specification = createSpecification(criteria);
         return sponsorAgreementRepository.findAll(specification, page);
     }
 
     /**
-     * Function to convert SponsorAgreementCriteria to a {@link Specifications}
+     * Function to convert SponsorAgreementCriteria to a {@link Specification}
      */
-    private Specifications<SponsorAgreement> createSpecification(SponsorAgreementCriteria criteria) {
-        Specifications<SponsorAgreement> specification = Specifications.where(null);
+    private Specification<SponsorAgreement> createSpecification(SponsorAgreementCriteria criteria) {
+        Specification<SponsorAgreement> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
                 specification = specification.and(buildSpecification(criteria.getId(), SponsorAgreement_.id));
