@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
 
-import { ITEMS_PER_PAGE, Principal, User, UserService } from '../../shared';
+import { ITEMS_PER_PAGE, Principal, User, UserService, ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-user-mgmt',
@@ -80,8 +79,8 @@ export class UserMgmtComponent implements OnInit, OnDestroy {
             page: this.page - 1,
             size: this.itemsPerPage,
             sort: this.sort()}).subscribe(
-                (res: HttpResponse<User[]>) => this.onSuccess(res.body, res.headers),
-                (res: HttpResponse<any>) => this.onError(res.body)
+            (res: ResponseWrapper) => this.onSuccess(res.json, res.headers),
+            (res: ResponseWrapper) => this.onError(res.json)
         );
     }
 

@@ -1,30 +1,32 @@
 import { Observable } from 'rxjs/Observable';
+import { RequestOptionsArgs, Response } from '@angular/http';
 import { LocalStorageService, SessionStorageService } from 'ngx-webstorage';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { JhiHttpInterceptor } from 'ng-jhipster';
 import { SERVER_API_URL } from '../../app.constants';
 
-export class AuthInterceptor implements HttpInterceptor {
+export class AuthInterceptor extends JhiHttpInterceptor {
 
     constructor(
         private localStorage: LocalStorageService,
         private sessionStorage: SessionStorageService
     ) {
+        super();
     }
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        if (!request || !request.url || (/^http/.test(request.url) && !(SERVER_API_URL && request.url.startsWith(SERVER_API_URL)))) {
-            return next.handle(request);
+    requestIntercept(options?: RequestOptionsArgs): RequestOptionsArgs {
+        if (!options || !options.url || (/^http/.test(options.url) && !(SERVER_API_URL && options.url.startsWith(SERVER_API_URL)))) {
+            return options;
         }
 
         const token = this.localStorage.retrieve('authenticationToken') || this.sessionStorage.retrieve('authenticationToken');
         if (!!token) {
-            request = request.clone({
-                setHeaders: {
-                    Authorization: 'Bearer ' + token
-                }
-            });
+            options.headers.append('Authorization', 'Bearer ' + token);
         }
-        return next.handle(request);
+        return options;
+    }
+
+    responseIntercept(observable: Observable<Response>): Observable<Response> {
+        return observable; // by pass
     }
 
 }

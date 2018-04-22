@@ -23,29 +23,33 @@ export class JhiAlertErrorComponent implements OnDestroy {
 
         this.cleanHttpErrorListener = eventManager.subscribe('jhipsterApp.httpError', (response) => {
             let i;
-            const httpErrorResponse = response.content;
-            switch (httpErrorResponse.status) {
+            const httpResponse = response.content;
+            switch (httpResponse.status) {
                 // connection refused, server not reachable
                 case 0:
                     this.addErrorAlert('Server not reachable', 'error.server.not.reachable');
                     break;
 
                 case 400:
-                    const arr = httpErrorResponse.headers.keys();
+                    const arr = Array.from(httpResponse.headers._headers);
+                    const headers = [];
+                    for (i = 0; i < arr.length; i++) {
+                        if (arr[i][0].endsWith('app-error') || arr[i][0].endsWith('app-params')) {
+                            headers.push(arr[i][0]);
+                        }
+                    }
+                    headers.sort();
                     let errorHeader = null;
                     let entityKey = null;
-                    arr.forEach((entry) => {
-                        if (entry.endsWith('app-error')) {
-                            errorHeader = httpErrorResponse.headers.get(entry);
-                        } else if (entry.endsWith('app-params')) {
-                            entityKey = httpErrorResponse.headers.get(entry);
-                        }
-                    });
+                    if (headers.length > 1) {
+                        errorHeader = httpResponse.headers.get(headers[0]);
+                        entityKey = httpResponse.headers.get(headers[1]);
+                    }
                     if (errorHeader) {
                         const entityName = entityKey;
                         this.addErrorAlert(errorHeader, errorHeader, { entityName });
-                    } else if (httpErrorResponse.error !== '' && httpErrorResponse.error.fieldErrors) {
-                        const fieldErrors = httpErrorResponse.error.fieldErrors;
+                    } else if (httpResponse.text() !== '' && httpResponse.json() && httpResponse.json().fieldErrors) {
+                        const fieldErrors = httpResponse.json().fieldErrors;
                         for (i = 0; i < fieldErrors.length; i++) {
                             const fieldError = fieldErrors[i];
                             // convert 'something[14].other[4].id' to 'something[].other[].id' so translations can be written to it
@@ -55,10 +59,10 @@ export class JhiAlertErrorComponent implements OnDestroy {
                             this.addErrorAlert(
                                 'Error on field "' + fieldName + '"', 'error.' + fieldError.message, { fieldName });
                         }
-                    } else if (httpErrorResponse.error !== '' && httpErrorResponse.error.message) {
-                        this.addErrorAlert(httpErrorResponse.error.message, httpErrorResponse.error.message, httpErrorResponse.error.params);
+                    } else if (httpResponse.text() !== '' && httpResponse.json() && httpResponse.json().message) {
+                        this.addErrorAlert(httpResponse.json().message, httpResponse.json().message, httpResponse.json().params);
                     } else {
-                        this.addErrorAlert(httpErrorResponse.error);
+                        this.addErrorAlert(httpResponse.text());
                     }
                     break;
 
@@ -67,10 +71,10 @@ export class JhiAlertErrorComponent implements OnDestroy {
                     break;
 
                 default:
-                    if (httpErrorResponse.error !== '' && httpErrorResponse.error.message) {
-                        this.addErrorAlert(httpErrorResponse.error.message);
+                    if (httpResponse.text() !== '' && httpResponse.json() && httpResponse.json().message) {
+                        this.addErrorAlert(httpResponse.json().message);
                     } else {
-                        this.addErrorAlert(httpErrorResponse.error);
+                        this.addErrorAlert(httpResponse.text());
                     }
             }
         });

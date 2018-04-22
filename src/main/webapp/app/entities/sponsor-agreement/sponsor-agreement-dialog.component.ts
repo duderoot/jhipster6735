@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,6 +10,7 @@ import { SponsorAgreement } from './sponsor-agreement.model';
 import { SponsorAgreementPopupService } from './sponsor-agreement-popup.service';
 import { SponsorAgreementService } from './sponsor-agreement.service';
 import { Sponsor, SponsorService } from '../sponsor';
+import { ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-sponsor-agreement-dialog',
@@ -35,17 +36,17 @@ export class SponsorAgreementDialogComponent implements OnInit {
         this.isSaving = false;
         this.sponsorService
             .query({filter: 'sponsoragreement-is-null'})
-            .subscribe((res: HttpResponse<Sponsor[]>) => {
+            .subscribe((res: ResponseWrapper) => {
                 if (!this.sponsorAgreement.sponsor || !this.sponsorAgreement.sponsor.id) {
-                    this.sponsors = res.body;
+                    this.sponsors = res.json;
                 } else {
                     this.sponsorService
                         .find(this.sponsorAgreement.sponsor.id)
-                        .subscribe((subRes: HttpResponse<Sponsor>) => {
-                            this.sponsors = [subRes.body].concat(res.body);
-                        }, (subRes: HttpErrorResponse) => this.onError(subRes.message));
+                        .subscribe((subRes: Sponsor) => {
+                            this.sponsors = [subRes].concat(res.json);
+                        }, (subRes: ResponseWrapper) => this.onError(subRes.json));
                 }
-            }, (res: HttpErrorResponse) => this.onError(res.message));
+            }, (res: ResponseWrapper) => this.onError(res.json));
     }
 
     clear() {
@@ -63,9 +64,9 @@ export class SponsorAgreementDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<HttpResponse<SponsorAgreement>>) {
-        result.subscribe((res: HttpResponse<SponsorAgreement>) =>
-            this.onSaveSuccess(res.body), (res: HttpErrorResponse) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<SponsorAgreement>) {
+        result.subscribe((res: SponsorAgreement) =>
+            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
     }
 
     private onSaveSuccess(result: SponsorAgreement) {

@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs/Subscription';
 import { JhiEventManager } from 'ng-jhipster';
 
@@ -32,10 +31,9 @@ export class SponsorDetailComponent implements OnInit, OnDestroy {
     }
 
     load(id) {
-        this.sponsorService.find(id)
-            .subscribe((sponsorResponse: HttpResponse<Sponsor>) => {
-                this.sponsor = sponsorResponse.body;
-            });
+        this.sponsorService.find(id).subscribe((sponsor) => {
+            this.sponsor = sponsor;
+        });
     }
     previousState() {
         window.history.back();

@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgModule, ElementRef, Renderer } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MockBackend } from '@angular/http/testing';
+import { Http, BaseRequestOptions } from '@angular/http';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JhiDataUtils, JhiDateUtils, JhiEventManager, JhiAlertService, JhiParseLinks } from 'ng-jhipster';
 
@@ -18,6 +19,8 @@ import { MockEventManager } from './helpers/mock-event-manager.service';
         JhiDataUtils,
         JhiDateUtils,
         JhiParseLinks,
+        MockBackend,
+        BaseRequestOptions,
         {
             provide: JhiEventManager,
             useClass:  MockEventManager
@@ -62,7 +65,13 @@ import { MockEventManager } from './helpers/mock-event-manager.service';
             provide: NgbModal,
             useValue: null
         },
-    ],
-    imports: [HttpClientTestingModule]
+        {
+            provide: Http,
+            useFactory: (backendInstance: MockBackend, defaultOptions: BaseRequestOptions) => {
+                return new Http(backendInstance, defaultOptions);
+            },
+            deps: [MockBackend, BaseRequestOptions]
+        }
+    ]
 })
 export class JhipsterTestModule {}

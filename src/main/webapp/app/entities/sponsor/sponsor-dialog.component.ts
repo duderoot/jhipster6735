@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,6 +10,7 @@ import { Sponsor } from './sponsor.model';
 import { SponsorPopupService } from './sponsor-popup.service';
 import { SponsorService } from './sponsor.service';
 import { SponsorAgreement, SponsorAgreementService } from '../sponsor-agreement';
+import { ResponseWrapper } from '../../shared';
 
 @Component({
     selector: 'jhi-sponsor-dialog',
@@ -34,7 +35,7 @@ export class SponsorDialogComponent implements OnInit {
     ngOnInit() {
         this.isSaving = false;
         this.sponsorAgreementService.query()
-            .subscribe((res: HttpResponse<SponsorAgreement[]>) => { this.sponsoragreements = res.body; }, (res: HttpErrorResponse) => this.onError(res.message));
+            .subscribe((res: ResponseWrapper) => { this.sponsoragreements = res.json; }, (res: ResponseWrapper) => this.onError(res.json));
     }
 
     clear() {
@@ -52,9 +53,9 @@ export class SponsorDialogComponent implements OnInit {
         }
     }
 
-    private subscribeToSaveResponse(result: Observable<HttpResponse<Sponsor>>) {
-        result.subscribe((res: HttpResponse<Sponsor>) =>
-            this.onSaveSuccess(res.body), (res: HttpErrorResponse) => this.onSaveError());
+    private subscribeToSaveResponse(result: Observable<Sponsor>) {
+        result.subscribe((res: Sponsor) =>
+            this.onSaveSuccess(res), (res: Response) => this.onSaveError());
     }
 
     private onSaveSuccess(result: Sponsor) {
